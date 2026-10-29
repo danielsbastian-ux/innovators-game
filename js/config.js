@@ -3,10 +3,10 @@
 //  Firebase console → Project settings → Your apps → Web app → "SDK setup and configuration" → Config
 // ================================================================
 export const firebaseConfig = {
-  apiKey: "",
-  authDomain: "",
+  apiKey: "AIza...",
+  authDomain: "innovators-game.firebaseapp.com",
   databaseURL: "https://innovators-game-default-rtdb.asia-southeast1.firebasedatabase.app",      // e.g. https://your-project-default-rtdb.asia-southeast1.firebasedatabase.app
-  projectId: "",
+  projectId: "innovators-game",
   storageBucket: "",
   messagingSenderId: "",
   appId: ""
