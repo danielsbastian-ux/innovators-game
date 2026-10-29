@@ -5,7 +5,7 @@
 export const firebaseConfig = {
   apiKey: "",
   authDomain: "",
-  databaseURL: "",      // e.g. https://your-project-default-rtdb.asia-southeast1.firebasedatabase.app
+  databaseURL: "https://innovators-game-default-rtdb.asia-southeast1.firebasedatabase.app",      // e.g. https://your-project-default-rtdb.asia-southeast1.firebasedatabase.app
   projectId: "",
   storageBucket: "",
   messagingSenderId: "",
