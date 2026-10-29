@@ -1,0 +1,34 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🗣️</text></svg>">
+<title>The Innovators</title>
+</head><body>
+<div class="landing">
+  <div class="hero">
+    <div class="pill" style="margin-bottom:14px">Sociolinguistics · Chapter 9 · Language change</div>
+    <h1>The Innovators</h1>
+    <p>A social-deduction role-play for the whole class. Secret Innovators spread a new pronunciation through a small community. Sociolinguists do fieldwork, gather evidence and trace the change to its source before it is complete.</p>
+  </div>
+  <div class="choice">
+    <div class="card stack">
+      <h3>🎓 Student</h3>
+      <p class="muted">Enter the room code shown on the projector.</p>
+      <input id="code" maxlength="4" placeholder="ABCD" autocapitalize="characters" autocomplete="off">
+      <button class="btn block" id="join">Join game</button>
+    </div>
+    <div class="card stack">
+      <h3>🧑‍🏫 Teacher</h3>
+      <p class="muted">Open the host screen on the projector computer.</p>
+      <a class="btn teal block" href="host.html" style="text-align:center;text-decoration:none">Host a game</a>
+      <a class="btn ghost block" href="printable.html" style="text-align:center;text-decoration:none">Paper backup (printable cards)</a>
+    </div>
+  </div>
+</div>
+<script>
+  const go = () => { const c = document.getElementById('code').value.toUpperCase().trim(); if (c.length === 4) location.href = 'play.html?code=' + c; };
+  document.getElementById('join').onclick = go;
+  document.getElementById('code').addEventListener('keydown', e => { if (e.key === 'Enter') go(); });
+</script>
+</body></html>

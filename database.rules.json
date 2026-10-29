@@ -1,0 +1,74 @@
+{
+  "rules": {
+    "games": {
+      "$code": {
+        ".read": "auth != null && root.child('games').child($code).child('host').val() === auth.uid",
+        "host": {
+          ".read": "auth != null",
+          ".write": "auth != null && (!data.exists() || data.val() === auth.uid)"
+        },
+        "settings": {
+          ".read": "auth != null",
+          ".write": "auth != null && root.child('games').child($code).child('host').val() === auth.uid"
+        },
+        "state": {
+          ".read": "auth != null",
+          ".write": "auth != null && root.child('games').child($code).child('host').val() === auth.uid"
+        },
+        "players": {
+          ".read": "auth != null",
+          "$uid": {
+            ".write": "auth != null && (auth.uid === $uid || root.child('games').child($code).child('host').val() === auth.uid)",
+            ".validate": "!newData.exists() || (newData.child('name').isString() && newData.child('name').val().length <= 24)"
+          }
+        },
+        "profiles": {
+          ".read": "auth != null",
+          ".write": "auth != null && root.child('games').child($code).child('host').val() === auth.uid"
+        },
+        "debrief": {
+          ".read": "auth != null",
+          ".write": "auth != null && root.child('games').child($code).child('host').val() === auth.uid"
+        },
+        "secrets": {
+          ".write": "auth != null && root.child('games').child($code).child('host').val() === auth.uid",
+          "$uid": {
+            ".read": "auth != null && auth.uid === $uid"
+          }
+        },
+        "hidden": {
+          ".write": "auth != null && root.child('games').child($code).child('host').val() === auth.uid"
+        },
+        "answers": {
+          "$uid": {
+            ".read": "auth != null && auth.uid === $uid",
+            "$round": {
+              "$qid": {
+                ".write": "auth != null && auth.uid === $uid && !data.exists()",
+                ".validate": "newData.isNumber()"
+              }
+            }
+          }
+        },
+        "requests": {
+          "$uid": {
+            ".read": "auth != null && auth.uid === $uid",
+            ".write": "auth != null && auth.uid === $uid"
+          }
+        },
+        "actions": {
+          "$uid": {
+            ".read": "auth != null && auth.uid === $uid",
+            ".write": "auth != null && auth.uid === $uid"
+          }
+        },
+        "votes": {
+          "$uid": {
+            ".read": "auth != null && auth.uid === $uid",
+            ".write": "auth != null && auth.uid === $uid"
+          }
+        }
+      }
+    }
+  }
+}
