@@ -86,3 +86,40 @@ export const CLUES = {
   apparent:  { cost: 2, name: "Apparent-time survey", desc: "See what % of each age group uses the variant.", needsTarget: false, concept: "Apparent time: comparing age groups to detect change." },
   interview: { cost: 3, name: "Network interview", desc: "Ask about one speaker: did they talk to anyone OUTSIDE their own network this round?", needsTarget: true, concept: "Link-persons carry change between networks." },
 };
+
+// ---- Field notes: a short reading shown at each task spot BEFORE the question (one per topic) ----
+// Written as brief summaries of Chapter 9 so students who have not read the chapter can still learn and answer.
+export const NOTES = {
+  "Variation & change": "Languages don't change by themselves: speakers do. Someone starts using a new form next to the old one (variation). If others copy it, the change is 'in progress'. If the new form finally replaces the old one, the change is complete. Slang words for 'really good' (groovy, cool, epic…) show this turnover clearly, and people often notice changes when they complain about them in letters, forums or blogs.",
+  "Post-vocalic [r]": "Post-vocalic [r] is the [r] after a vowel in words like car and start. Accents that pronounce it are 'rhotic'. In England, dropping this [r] began in the south-east and is slowly moving west, so rhotic speech there often sounds rural. In New York the opposite happened: pronouncing [r] became prestigious, and young upper-middle-class speakers led the change.",
+  "Above & below": "'Change from above' has two meanings: speakers are aware of the change (often a prestige form), or the change spreads down from higher social groups. 'Change from below' also has two meanings: speakers don't notice it (many vowel changes), or it spreads up from lower social groups. The two meanings of each term often go together, but not always.",
+  "Martha's Vineyard": "Martha's Vineyard is a small US island full of summer tourists. In the 1960s Labov found that local fishermen were using an old, 'centralised' pronunciation of the vowels in words like light and house. It signalled 'I'm a real islander' against the tourists. Other groups who identified with the island copied it. This is covert prestige: a form valued for identity and solidarity, not for status.",
+  "Koines": "When speakers of DIFFERENT DIALECTS come together (for example in a new town), a new mixed variety called a koine can develop. It usually takes most features from the biggest group. 'Levelling' removes unusual forms, and simpler forms tend to win. Social factors still matter: a form linked to low status may disappear anyway. In big multi-ethnic cities, young people create 'multi-ethnolects' such as Multicultural London English.",
+  "How change spreads": "Wave theory pictures change spreading outwards like ripples through age, social and regional groups. New forms enter a group through 'middle' people who have contacts in more than one group. Prestige forms usually start in the most formal speech of high-status groups. Vernacular forms start in casual speech, often in the middle of the social scale. Over time a change follows an S-curve: slow start, fast middle, slow finish.",
+  "Lexical diffusion": "A sound change doesn't hit every word at once: it spreads from word to word. This is called lexical diffusion. In Belfast a vowel changed in one word before another. Some words never change at all, which is why tough and trough still end in [f]. In French, a change that removed final [n] took about five centuries to move through the vocabulary.",
+  "Apparent vs real time": "Apparent time means comparing age groups at ONE moment: if the young use a form more, it may be spreading. But young people often use more vernacular forms anyway and drop them later (age-grading), so be careful. Real time means studying the same community at TWO moments, as when Trudgill went back to Norwich after 15 years. It is more reliable, but much slower.",
+  "Status & gender": "High-status groups often bring in prestige forms from places they admire, while lower-status groups spread changes that express local solidarity. In many studies women lead changes towards the standard, and sometimes towards vernacular forms too. Men more often introduce vernacular forms. There are exceptions: young women in a Belfast area brought in a vernacular form that was admired locally, and village women in Spain moved towards standard forms because they wanted a different life.",
+  "Networks & media": "Close-knit, isolated communities change slowly. Iceland stayed conservative because its communities kept in close contact. Changes travel through social networks, especially via link-persons who move between two close-knit groups (like a young man travelling between Norwich and London). Most researchers think media alone cannot change how people speak: real face-to-face contact is needed, though TV may make listeners more open to new forms.",
+  "Contact & New Englishes": "In multilingual places, contact between languages drives change. Schneider's model describes five stages for new Englishes: foundation, exonormative stabilisation (outside norms, e.g. British), nativisation, endonormative stabilisation (a local standard emerges), and differentiation (new local dialects). Singapore English, for example, now has its own vowel patterns that are not copied from Britain or America.",
+};
+
+// ---- Key terms (📖 glossary on the phone) ----
+export const GLOSSARY = [
+  ["Variant", "One way of saying something when there is more than one (e.g. 'think' vs 'fink')."],
+  ["Innovation", "A new form that a speaker starts to use. It becomes a change only if others adopt it."],
+  ["Change from above", "A change speakers are aware of (often towards prestige), or one spreading down from higher social groups."],
+  ["Change from below", "A change below conscious awareness, or one spreading up from lower social groups."],
+  ["Overt prestige", "Value linked to status and 'correct' standard speech."],
+  ["Covert prestige", "Value linked to local identity, solidarity or being 'cool' (e.g. Martha's Vineyard vowels)."],
+  ["Close-knit network", "A group where everyone knows everyone in many roles. It keeps local forms and resists outsiders."],
+  ["Loose-knit network", "A group with many outside contacts. It is more open to new forms."],
+  ["Link-person (↔)", "Someone with ties to two groups who carries new forms between them."],
+  ["Wave theory", "Changes spread outwards from a source group, like ripples."],
+  ["S-curve", "Change starts slowly, speeds up in the middle, then slows down near completion."],
+  ["Lexical diffusion", "A sound change spreading through the vocabulary word by word."],
+  ["Apparent time", "Comparing age groups at one point in time to detect change."],
+  ["Real time", "Comparing the same community at two points in time."],
+  ["Age-grading", "Young people using more vernacular forms and dropping them as they get older. This is NOT change."],
+  ["Koine", "A new variety formed when different dialects come into contact."],
+  ["Rhotic accent", "An accent that pronounces [r] after vowels (car, start)."],
+];
