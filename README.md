@@ -15,6 +15,10 @@ A social-deduction game for **Sociolinguistics, Chapter 9: Language change** (Ho
 - **Face-to-face chats:** when two characters meet on the map, a student taps **💬 Talk**. Both phones buzz: "Chat with Budi! Find them in the room and talk in character." Each student can have at most 2 chats per round. The Innovators' chats are how the variant spreads. Everyone's chats earn tokens, so the Innovators blend in.
 - **Town meeting:** each meeting has a community issue (a tourist resort, a bridge to the mainland, closing the village school…). Characters argue about it, then the class discusses who started the new way of speaking.
 
+- **Full-screen phone controls:** during fieldwork the phone works like a game. The map fills the screen, the joystick is bottom-left, and four big action buttons are bottom-right: **💬 Talk** (lights up next to someone), **📝 Task** (lights up at a task spot), **🎙️ Record** and **▶ Listen**. The bottom bar opens Tasks, Evidence, Me (role, character, variant) and 📖 Terms without leaving the map.
+- **Field notes (no preparation needed):** each task opens with a short 📖 field note explaining the Chapter 9 concept (e.g. covert prestige, apparent time) before the question. A 📖 Terms glossary is always one tap away.
+- **Voice notes:** students can record a short voice note in character (max 12 s). Anyone near them on the map can tap **▶ Listen**. In the town meeting, the 👂 Listening log has a ▶ button for every voice note, and buying a "Speech recording" as evidence lets you play that person's clip. Useful in a noisy room or with remote students. The browser asks for microphone permission the first time.
+
 **Who wins.**
 - **Sociolinguists** win if they vote out every Innovator, or if the research bar fills first.
 - **Innovators** win if the variant reaches the tipping point (default 70%), or if they survive all the rounds.
@@ -88,7 +92,7 @@ A social-deduction game for **Sociolinguistics, Chapter 9: Language change** (Ho
 
 The game needs at least 4 players. To test alone, press **🤖 Add 5 test bots** in the host lobby (press it again for more). Bots are simulated students run by the host page: they answer tasks (about 70% correct), Innovator bots spread the variant, and all bots vote. Join from your phone as one real player, shorten the timers in Settings, and play a full game. Press **Remove bots** before your real class.
 
-> **Firebase rules updated again for the island map** (new `pos` section). If you pasted the rules before, paste the new `database.rules.json` again and click Publish.
+> **Firebase rules updated again** (new `pos`, `voice` and `voiceIdx` sections for the map and voice notes). If you pasted the rules before, paste the new `database.rules.json` again and click Publish.
 >
 > If you pasted the Firebase rules before this version, paste the new `database.rules.json` again (Firebase → Realtime Database → Rules → Publish), so that the host is allowed to act for the bots.
 
