@@ -76,6 +76,12 @@ A social-deduction game for **Sociolinguistics, Chapter 9: Language change** (Ho
 
 ---
 
+## Testing on your own with test bots
+
+The game needs at least 4 players. To test alone, press **🤖 Add 5 test bots** in the host lobby (press it again for more). Bots are simulated students run by the host page: they answer tasks (about 70% correct), Innovator bots spread the variant, and all bots vote. Join from your phone as one real player, shorten the timers in Settings, and play a full game. Press **Remove bots** before your real class.
+
+> If you pasted the Firebase rules before this version, paste the new `database.rules.json` again (Firebase → Realtime Database → Rules → Publish), so that the host is allowed to act for the bots.
+
 ## Running it in class (suggested 90-minute session)
 
 | Time | What happens |
@@ -88,7 +94,7 @@ A social-deduction game for **Sociolinguistics, Chapter 9: Language change** (Ho
 
 **Tips**
 - Keep the host tab open for the whole game: it runs the game logic. If you refresh it by accident, choose **Resume game**.
-- Settings (in the lobby): use **2 Innovators** for fewer than 12 players. Lower the research target if your class answers slowly. Lengthen the meeting if discussion is good.
+- Settings (in the lobby): the game uses about 1 Innovator per 6 players automatically (max = the Innovators setting). Lower the research target if your class answers slowly. Lengthen the meeting if discussion is good.
 - Students who are voted out can still answer fieldwork tasks, but they can't vote.
 - Phones that sleep reconnect by themselves. If a student closes the page, they can reopen the same link on the same phone and continue.
 - After class you can delete old games in Firebase: Realtime Database → Data → hover over `games` → 🗑.
