@@ -5,4 +5,24 @@
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🗣️</text></svg>">
 <title>The Innovators</title>
 </head><body><div id="app"><p class="center muted" style="margin-top:40px">Loading…</p></div>
+<script>
+// Shows any problem on screen (instead of the game silently stopping)
+(function () {
+  function show(msg) {
+    var b = document.getElementById("errbar");
+    if (!b) { b = document.createElement("div"); b.id = "errbar"; b.style.cssText = "position:fixed;left:0;right:0;top:0;z-index:99;background:#5a1010;color:#fff;padding:12px 16px;font:15px system-ui;box-shadow:0 4px 16px rgba(0,0,0,.5)"; document.body.appendChild(b); }
+    var hint = "";
+    if (/permission/i.test(msg)) hint = "<br><b>Fix:</b> paste the newest database.rules.json into Firebase → Realtime Database → Rules, click Publish, then refresh this page.";
+    else if (/import|module|Failed to fetch|404|export|missing|did not load/i.test(msg)) hint = "<br><b>Fix:</b> a game file is missing or out of date. Check that the js folder on GitHub has map.js and roleplay.js, then refresh with Ctrl+F5 (Mac: Cmd+Shift+R).";
+    b.innerHTML = "⚠️ <b>Problem:</b> " + String(msg).replace(/</g, "&lt;") + hint + ' <button onclick="this.parentNode.remove()" style="margin-left:8px">✕</button>';
+  }
+  window.showGameError = show;
+  window.addEventListener("error", function (e) { show(e.message || "Script error"); });
+  window.addEventListener("unhandledrejection", function (e) { show((e.reason && (e.reason.message || e.reason)) || "Unknown error"); });
+  setTimeout(function () {
+    var a = document.getElementById("app");
+    if (a && /Loading…/.test(a.textContent) && a.children.length <= 1) show("The game files did not load (missing file?)");
+  }, 10000);
+})();
+</script>
 <script type="module" src="js/play.js"></script></body></html>
