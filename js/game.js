@@ -56,7 +56,7 @@ export function assignRoles(uids, settings, r = Math.random) {
     const others = GROUP_KEYS.filter(g => g !== profiles[uid].group);
     profiles[uid].link = pick(others, r);
   });
-  const nInn = Math.min(settings.innovators, Math.max(1, Math.floor(uids.length / 3)));
+  const nInn = Math.max(1, Math.min(settings.innovators, Math.round(uids.length / 6))); // ~1 per 6 players, capped by the setting
   const innovators = new Set(shuffle(uids, r).slice(0, nInn));
   const roles = {};
   uids.forEach(u => roles[u] = innovators.has(u) ? "innovator" : "sociolinguist");

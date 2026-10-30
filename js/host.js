@@ -97,6 +97,7 @@ function scores() {
 async function onGame() {
   if (!game) { render(); return; }
   render();
+  runBots();
   const ph = st().phase;
   if (["fieldwork", "meeting", "vote", "reveal"].includes(ph) && !busy) {
     const { tokens, research } = scores();
@@ -122,6 +123,60 @@ async function onGame() {
       if (alive.length && alive.every(u => game.votes?.[u]?.[r] != null)) advance();
     }
   }
+}
+
+// ---------- test bots (simulated students, run by this host page) ----------
+const isBot = u => String(u).startsWith("bot_");
+const botJobs = new Set();
+function runBots() {
+  const s = st(), ph = s.phase, r = s.round;
+  for (const b of allUids().filter(isBot)) {
+    const key = `${ph}:${r}:${b}`;
+    if (botJobs.has(key)) continue;
+    if (ph === "fieldwork" && arr(game.secrets?.[b]?.qs?.[r]).length) {
+      botJobs.add(key); setTimeout(() => botFieldwork(b, r), 2000 + Math.random() * 8000);
+    } else if (ph === "vote" && profiles()[b]?.alive !== false) {
+      botJobs.add(key); setTimeout(() => botVote(b, r), 1500 + Math.random() * 6000);
+    }
+  }
+}
+async function botFieldwork(b, r) {
+  if (!game || st().phase !== "fieldwork" || st().round !== r) return;
+  const upd = {};
+  for (const qid of arr(game.secrets?.[b]?.qs?.[r])) {
+    const q = QMAP[qid];
+    if (!q || game.answers?.[b]?.[r]?.[qid] != null) continue;
+    upd[`answers/${b}/${r}/${qid}`] = Math.random() < 0.7 ? q.a : (q.a + 1 + Math.floor(Math.random() * (q.o.length - 1))) % q.o.length;
+  }
+  if (roleOf(b) === "innovator" && profiles()[b]?.alive !== false) {
+    const pr = normProfiles(), known = hidden().adopted || {};
+    const cands = G.shuffle(activeUids().filter(u => u !== b && !known[u] && roleOf(u) !== "innovator"));
+    cands.sort((x, y) => G.spreadChance(pr[b], pr[y]) - G.spreadChance(pr[b], pr[x]));
+    upd[`actions/${b}/${r}`] = { targets: cands.slice(0, S().targetsPerInnovator), media: r === 2 };
+  }
+  if (Object.keys(upd).length) await db.update(`games/${code}`, upd);
+}
+async function botVote(b, r) {
+  if (!game || st().phase !== "vote" || st().round !== r || game.votes?.[b]?.[r] != null) return;
+  const opts = activeUids().filter(u => u !== b && !(roleOf(b) === "innovator" && roleOf(u) === "innovator"));
+  const v = !opts.length || Math.random() < 0.2 ? "skip" : G.pick(opts);
+  await db.set(`games/${code}/votes/${b}/${r}`, v);
+}
+async function addBots(n) {
+  const used = new Set(Object.values(players()).map(p => p.color));
+  let k = Object.keys(players()).filter(isBot).length;
+  const upd = {};
+  for (let i = 0; i < n; i++) {
+    const id = "bot_" + Math.random().toString(36).slice(2, 9);
+    const color = G.COLORS.find(c => !used.has(c)) || G.pick(G.COLORS); used.add(color);
+    upd[`players/${id}`] = { name: `Bot ${++k}`, color, joinedAt: db.now(), bot: true };
+  }
+  await db.update(`games/${code}`, upd);
+}
+async function removeBots() {
+  const upd = {};
+  for (const u of Object.keys(players()).filter(isBot)) upd[`players/${u}`] = null;
+  if (Object.keys(upd).length) await db.update(`games/${code}`, upd);
 }
 
 function answerClue(u, rq, have) {
@@ -440,7 +495,7 @@ function renderLobby() {
   const s = S();
   const url = new URL(`play.html?code=${code}`, location.href).href;
   const ps = players();
-  const chips = Object.entries(ps).map(([u, p]) => `<span class="chip">${avatar(p)}${esc(p.name)}<button title="Remove" data-kick="${u}">✕</button></span>`).join("") || `<span class="muted">No players yet…</span>`;
+  const chips = Object.entries(ps).map(([u, p]) => `<span class="chip">${avatar(p)}${p.bot ? "🤖 " : ""}${esc(p.name)}<button title="Remove" data-kick="${u}">✕</button></span>`).join("") || `<span class="muted">No players yet…</span>`;
   const n = Object.keys(ps).length;
   const field = (k, label, min, max, step = 1) => `<div><label>${label}</label><input type="number" data-set="${k}" value="${s[k]}" min="${min}" max="${max}" step="${step}"></div>`;
   $("#app").innerHTML = `
@@ -456,7 +511,10 @@ function renderLobby() {
       </div>
     </div>
     <div class="card stack"><div class="row spread"><h3>Players (${n})</h3>
-      <button class="btn" id="start" ${n < 4 ? "disabled" : ""}>Start game ▸</button></div>
+      <div class="row">
+        <button class="btn ghost sm" id="bots" title="Simulated students for testing">🤖 Add 5 test bots</button>
+        ${Object.keys(ps).some(isBot) ? `<button class="btn ghost sm" id="nobots">Remove bots</button>` : ""}
+        <button class="btn" id="start" ${n < 4 ? "disabled" : ""}>Start game ▸</button></div></div>
       <div class="chips">${chips}</div></div>
     <details class="card" id="setbox" ${settingsOpen ? "open" : ""}><summary><b>Settings</b> <span class="muted small">(defaults suit about 20 students / 60 to 80 minutes)</span></summary>
       <div class="settings" style="margin-top:12px">
@@ -469,10 +527,12 @@ function renderLobby() {
         ${field("researchPerPlayer", "Research target per player", 2, 20)}
         <div><label>Reveal role when voted out</label><select data-set="revealOnEject"><option value="true" ${s.revealOnEject ? "selected" : ""}>Yes</option><option value="false" ${!s.revealOnEject ? "selected" : ""}>No</option></select></div>
       </div>
-      <p class="small muted">Tip: for fewer than 12 players use 2 Innovators.</p>
+      <p class="small muted">The game automatically uses about 1 Innovator per 6 players (never more than the number above).</p>
     </details>
   </div>`;
   try { if (window.QRCode) new QRCode($("#qr"), { text: url, width: 180, height: 180 }); else $("#qr").style.display = "none"; } catch { $("#qr").style.display = "none"; }
+  $("#bots").onclick = () => addBots(5);
+  const nb = $("#nobots"); if (nb) nb.onclick = removeBots;
   $("#setbox").ontoggle = () => { settingsOpen = $("#setbox").open; };
   $("#start").onclick = () => { if (!busy) { busy = true; startGame().finally(() => busy = false); } };
   document.querySelectorAll("[data-kick]").forEach(b => b.onclick = () => db.remove(`games/${code}/players/${b.dataset.kick}`));
