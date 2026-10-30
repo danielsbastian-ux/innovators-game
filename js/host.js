@@ -363,6 +363,9 @@ async function advance() {
       if (st().round >= S().maxRounds) await endGame("innovators", `After ${S().maxRounds} rounds the Innovators were still in the community: the new variant is here to stay.`);
       else await startRound();
     }
+  } catch (e) {
+    console.error(e);
+    window.showGameError?.((e && e.message) || String(e));
   } finally { busy = false; }
 }
 
@@ -413,7 +416,8 @@ async function startRound() {
     const [x, y] = M.homeSpot(profiles()[u]?.group);
     start[u] = { x: Math.round(x), y: Math.round(y) };
   }
-  await db.update(`pos/${code}`, start);
+  try { await db.update(`pos/${code}`, start); }
+  catch (e) { throw new Error("PERMISSION_DENIED for character positions (pos). The Firebase rules are the old version."); }
   trails = {}; rejected.clear();
   upd["state/issue"] = (round - 1) % ISSUES.length;
   upd["state/prompt"] = (round - 1) % PROMPTS.length;
@@ -714,7 +718,7 @@ function renderLobby() {
   $("#bots").onclick = () => addBots(5);
   const nb = $("#nobots"); if (nb) nb.onclick = removeBots;
   $("#setbox").ontoggle = () => { settingsOpen = $("#setbox").open; };
-  $("#start").onclick = () => { if (!busy) { busy = true; startGame().finally(() => busy = false); } };
+  $("#start").onclick = () => { if (!busy) { busy = true; startGame().catch(e => window.showGameError?.(e.message || String(e))).finally(() => busy = false); } };
   document.querySelectorAll("[data-kick]").forEach(b => b.onclick = () => db.remove(`games/${code}/players/${b.dataset.kick}`));
   document.querySelectorAll("[data-set]").forEach(i => i.onchange = () => {
     const k = i.dataset.set; const v = k === "revealOnEject" ? i.value === "true" : k === "variant" ? i.value : Number(i.value);
