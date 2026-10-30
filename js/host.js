@@ -737,11 +737,11 @@ function renderLobby() {
         ${Object.keys(ps).some(isBot) ? `<button class="btn ghost sm" id="nobots">Remove bots</button>` : ""}
         <button class="btn" id="start" ${n < 4 ? "disabled" : ""}>Start game ▸</button></div></div>
       <div class="chips">${chips}</div></div>
-    <details class="card" id="setbox" ${settingsOpen ? "open" : ""}><summary><b>Settings</b> <span class="muted small">(defaults suit about 20 students / 60 to 80 minutes)</span></summary>
+    <details class="card" id="setbox" ${settingsOpen ? "open" : ""}><summary><b>Settings</b> <span class="muted small">(defaults: fieldwork 7 min, meeting 7 min, vote 1.5 min, about 16 min per round)</span></summary>
       <div class="settings" style="margin-top:12px">
         ${field("innovators", "Innovators", 1, 5)}
-        ${field("fieldworkSec", "Fieldwork (sec)", 30, 600, 10)}
-        ${field("meetingSec", "Meeting (sec)", 30, 600, 10)}
+        ${field("fieldworkSec", "Fieldwork (sec)", 30, 1200, 10)}
+        ${field("meetingSec", "Meeting (sec)", 30, 1200, 10)}
         ${field("voteSec", "Vote (sec)", 15, 300, 5)}
         ${field("maxRounds", "Max rounds", 2, 10)}
         ${field("tipping", "Change complete at (%)", 40, 95, 5)}
