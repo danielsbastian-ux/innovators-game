@@ -40,10 +40,11 @@
   <h2>Paper rules (teacher-run)</h2>
   <ol>
     <li><b>Setup.</b> Each student gets a card with a secret role, a network group and an age group. Write everyone's name, group and age on the board (not their role!). Link-persons (↔) are also marked on the board.</li>
-    <li><b>Fieldwork (about 3 min).</b> Show 3 Chapter 9 questions on the screen (or use any quiz). Each correct answer = 1 token. Innovators secretly write on a slip of paper the names of 2 people they "talk to" and hand it to you.</li>
-    <li><b>Spread (you).</b> For each name on an Innovator's slip, roll a die. Same network group: the person adopts the variant on <b>3–6</b>. A link-person is involved: <b>4–6</b>. Different group, loose-knit (Market, Campus): <b>5–6</b>. Different group, close-knit (Harbour, Hillside): <b>6</b> only. Also, each earlier adopter passes it to one random member of their own group on a <b>6</b>. Mark adopters secretly on your tracking sheet. Announce only the total %.</li>
+    <li><b>Characters and variant.</b> Each card gives a job; students play that character whenever they speak. Write the "variable under study" (printed on the cards) on the board.</li>
+    <li><b>Fieldwork (about 7 min).</b> Everyone walks around and chats in character with 2 people. Innovators use the variant and then secretly hand you a slip with the names of the 2 people they chatted with. Then show 3 Chapter 9 questions on the screen: each correct answer = 1 token.</li>
+    <li><b>Spread (you).</b> For each name on an Innovator's slip, roll a die. Same network group: the person adopts the variant on <b>3–6</b>. A link-person is involved: <b>4–6</b>. Different group, loose-knit (Market, Campus): <b>5–6</b>. Different group, close-knit (Harbour, Hillside): <b>6</b> only. Also, each earlier adopter passes it to one random member of their own group on a <b>6</b>. Mark adopters secretly on your tracking sheet and quietly tell each new adopter: "You've picked it up. Start using it." Announce only the total %.</li>
     <li><b>Evidence.</b> Students can trade tokens with you for evidence: 1 token = "Does X use the variant?"; 2 tokens = % of users per network group, or per age group; 3 tokens = "Did X talk to someone outside their network last round?" Write the answer on a slip.</li>
-    <li><b>Meeting and vote.</b> Discuss for 3 minutes, then vote by raising hands (or on paper). The person with the most votes is out. Reveal their role.</li>
+    <li><b>Town meeting and vote.</b> Give a town issue (e.g. "Should we build a tourist resort?"). Students speak in character while Sociolinguists listen for the variant. Discuss for 6–7 minutes, then vote by raising hands (or on paper). The person with the most votes is out. Reveal their role.</li>
     <li><b>Winning.</b> Sociolinguists win by voting out all Innovators. Innovators win if 70% of the community uses the variant, or if they survive 5 rounds.</li>
   </ol>
 </div>
@@ -53,6 +54,9 @@
 <script>
 const GROUPS = [["Harbour","⚓","close-knit"],["Hillside Farms","🌾","close-knit"],["Market Town","🛒","loose-knit"],["Campus","🎓","loose-knit"]];
 const AGES = ["Teens","20s–30s","40s–50s","60+"];
+const JOBS = {"Harbour":["fisher","harbour café owner","boat repairer","ferry deckhand","fish-market seller"],"Hillside Farms":["farmer","cheese maker","village teacher","hillside shop owner","beekeeper"],"Market Town":["phone seller","food-stall owner","bus driver","bank clerk","souvenir-shop owner"],"Campus":["first-year student","linguistics lecturer","campus radio DJ","student union leader","library assistant"]};
+const VARIANTS = ["th-fronting: say 'fink' for think, 'free' for three", "new slang: 'glim' = really good", "tag 'innit?' at the end of sentences", "'this is me: ...' to report what you said", "uptalk: your voice rises at the end of statements"];
+const VARIANT = VARIANTS[Math.floor(Math.random() * VARIANTS.length)];
 const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
 function gen() {
   const n = Math.max(4, Math.min(40, +document.getElementById('n').value || 20));
@@ -64,10 +68,10 @@ function gen() {
   const card = p => `<div class="card ${p.inn ? 'inn' : 'soc'}">
     <div class="small">Card #${p.no} · keep this secret</div>
     <div class="role">${p.inn ? 'INNOVATOR' : 'SOCIOLINGUIST'}</div>
-    <div><b>${p.group[1]} ${p.group[0]}</b> (${p.group[2]}) · ${p.age}${p.link ? ` · ↔ link-person, also tied to ${p.group === p.link ? '' : p.link[1] + ' ' + p.link[0]}` : ''}</div>
+    <div><b>${p.group[1]} ${p.group[0]}</b> (${p.group[2]}) · ${p.age} · <b>${JOBS[p.group[0]][Math.floor(Math.random() * 5)]}</b>${p.link ? ` · ↔ link-person, also tied to ${p.group === p.link ? '' : p.link[1] + ' ' + p.link[0]}` : ''}</div>
     <p class="small">${p.inn
-      ? `You speak a new variant. Each round, secretly give the teacher 2 names to "talk to". Don't get voted out! Your teammates: card(s) ${people.filter(x => x.inn && x !== p).map(x => '#' + x.no).join(', ') || 'none'}.`
-      : 'A sound change is spreading. Answer fieldwork questions for tokens, buy evidence, and vote out the Innovators. Remember: ordinary people can pick up the variant without noticing!'}</p>
+      ? `You already speak the new way (<b>${VARIANT}</b>). Use it every time you speak! Each round, chat in character with 2 people, then secretly give the teacher their names. Don't get voted out! Your teammates: card(s) ${people.filter(x => x.inn && x !== p).map(x => '#' + x.no).join(', ') || 'none'}.`
+      : `A language change is spreading. Listen for: <b>${VARIANT}</b>. Chat in character, answer fieldwork questions for tokens, buy evidence, and vote out the Innovators. If the teacher tells you that you've picked it up, start using it too!`}</p>
   </div>`;
   const rows = people.map(p => `<tr><td>#${p.no}</td><td></td><td>${p.group[1]} ${p.group[0]}</td><td>${p.age}</td><td>${p.link ? '↔ ' + p.link[0] : ''}</td><td>${p.inn ? '<b>INNOVATOR</b>' : ''}</td><td></td><td></td><td></td><td></td><td></td></tr>`).join('');
   document.getElementById('out').innerHTML = `

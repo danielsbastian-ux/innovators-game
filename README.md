@@ -23,7 +23,7 @@ A social-deduction game for **Sociolinguistics, Chapter 9: Language change** (Ho
 - **Sociolinguists** win if they vote out every Innovator, or if the research bar fills first.
 - **Innovators** win if the variant reaches the tipping point (default 70%), or if they survive all the rounds.
 
-**Each round:** Fieldwork: chats + tasks (3.5 min) → spread is calculated → Town meeting (3.5 min) → Vote (45 s) → Reveal. At the end, the projector shows a debrief: the adoption curve compared with the S-curve, adoption by network and by age group, who passed the variant to whom, and six discussion questions tied to the chapter.
+**Each round (about 16 min):** Fieldwork: map, chats + tasks (7 min) → spread is calculated → Town meeting (7 min) → Vote (1.5 min) → Reveal. At the end, the projector shows a debrief: the adoption curve compared with the S-curve, adoption by network and by age group, who passed the variant to whom, and six discussion questions tied to the chapter.
 
 ---
 
@@ -103,7 +103,7 @@ The game needs at least 4 players. To test alone, press **🤖 Add 5 test bots**
 | 0–10 min | Brief intro: speaker innovation, how changes spread. Show the host lobby; students scan the QR code and join. |
 | 10–15 | Press **Start game**. Students secretly read their role card and character card. Explain the map: network groups, close-knit vs loose-knit, link-persons (↔). |
 | 10–15 (cont.) | Model it once: chat with a student in character for 30 seconds using the variant, then swap chat codes. |
-| 15–60 | Play 3–5 rounds. The host page moves to the next phase automatically when the timer runs out. Use **+30 s** or the **Next ▸** button whenever you like. |
+| 15–65 | Play 3 rounds (about 16 min each; set **Max rounds** to 3 in Settings for a 90-minute class). The host page moves to the next phase automatically when the timer runs out. Use **+30 s** or the **Next ▸** button whenever you like. |
 | 60–85 | **Debrief** on the projector: the curve vs the S-curve, adoption by network and age group, who passed it to whom, and the six discussion questions. |
 | 85–90 | Exit ticket: "Explain one Chapter 9 concept using something that happened in the game." |
 
