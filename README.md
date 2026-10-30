@@ -8,11 +8,18 @@ A social-deduction game for **Sociolinguistics, Chapter 9: Language change** (Ho
 - Everyone else is a **Sociolinguist**. They answer Chapter 9 fieldwork questions to earn tokens and fill the class research bar. They spend tokens on evidence (speech recordings, network surveys, apparent-time surveys, network interviews), then discuss and vote out suspects.
 - Ordinary students can pick up the variant **without knowing it** (change from below). So "uses the variant" does not prove someone is an Innovator.
 
+**The role-play.**
+- **Characters:** every student gets a character card: a job (fisher, café owner, radio DJ, bank clerk…), an attitude that fits their network (proud local, businessperson, trend-loving student…), a personal goal, and notes for their age group and link-person ties. They speak as this character all game.
+- **A variant students actually say:** each game has one "variable under study" that students really use when speaking: th-fronting ("I fink so"), the slang word "glim", the tag "innit?", the quotative "this is me: …", or uptalk. Innovators use it every time they speak. When a student picks it up, their phone tells them to start using it too. Sociolinguists listen for it and mark who they hear in a private listening log.
+- **Walking on the island map:** in fieldwork, every student moves their own character (an original speech-bubble figure) around the island on their phone, using the joystick, by tapping the map, or with arrow keys on a laptop. Fieldwork tasks are locked at places on the map (Harbour dock, Market square, Campus library…), so students must walk there to answer them. The projector shows everyone moving live. In the meeting it shows dotted trails of where each person walked, which is evidence for the discussion.
+- **Face-to-face chats:** when two characters meet on the map, a student taps **💬 Talk**. Both phones buzz: "Chat with Budi! Find them in the room and talk in character." Each student can have at most 2 chats per round. The Innovators' chats are how the variant spreads. Everyone's chats earn tokens, so the Innovators blend in.
+- **Town meeting:** each meeting has a community issue (a tourist resort, a bridge to the mainland, closing the village school…). Characters argue about it, then the class discusses who started the new way of speaking.
+
 **Who wins.**
 - **Sociolinguists** win if they vote out every Innovator, or if the research bar fills first.
 - **Innovators** win if the variant reaches the tipping point (default 70%), or if they survive all the rounds.
 
-**Each round:** Fieldwork (2.5 min) → spread is calculated → Community meeting (2.5 min) → Vote (45 s) → Reveal. At the end, the projector shows a debrief: the adoption curve compared with the S-curve, adoption by network and by age group, who passed the variant to whom, and six discussion questions tied to the chapter.
+**Each round:** Fieldwork: chats + tasks (3.5 min) → spread is calculated → Town meeting (3.5 min) → Vote (45 s) → Reveal. At the end, the projector shows a debrief: the adoption curve compared with the S-curve, adoption by network and by age group, who passed the variant to whom, and six discussion questions tied to the chapter.
 
 ---
 
@@ -25,6 +32,7 @@ A social-deduction game for **Sociolinguistics, Chapter 9: Language change** (Ho
 | `play.html` | Student phone screen |
 | `printable.html` | **Paper backup**: printable role cards, tracking sheet and dice rules for when the internet fails |
 | `js/questions.js` | The 54 fieldwork questions and the evidence types. **Edit this to change or add questions.** |
+| `js/roleplay.js` | Characters, the speakable variants, chat topics and town-meeting issues. **Edit this to change the role-play.** |
 | `js/game.js` | Rules and settings (spread chances, defaults) |
 | `js/config.js` | **Where you paste your Firebase config** (step 2) |
 | `database.rules.json` | Security rules to paste into Firebase (step 2) |
@@ -80,6 +88,8 @@ A social-deduction game for **Sociolinguistics, Chapter 9: Language change** (Ho
 
 The game needs at least 4 players. To test alone, press **🤖 Add 5 test bots** in the host lobby (press it again for more). Bots are simulated students run by the host page: they answer tasks (about 70% correct), Innovator bots spread the variant, and all bots vote. Join from your phone as one real player, shorten the timers in Settings, and play a full game. Press **Remove bots** before your real class.
 
+> **Firebase rules updated again for the island map** (new `pos` section). If you pasted the rules before, paste the new `database.rules.json` again and click Publish.
+>
 > If you pasted the Firebase rules before this version, paste the new `database.rules.json` again (Firebase → Realtime Database → Rules → Publish), so that the host is allowed to act for the bots.
 
 ## Running it in class (suggested 90-minute session)
@@ -87,12 +97,17 @@ The game needs at least 4 players. To test alone, press **🤖 Add 5 test bots**
 | Time | What happens |
 |---|---|
 | 0–10 min | Brief intro: speaker innovation, how changes spread. Show the host lobby; students scan the QR code and join. |
-| 10–15 | Press **Start game**. Students secretly read their role card. Explain the map: network groups, close-knit vs loose-knit, link-persons (↔). |
+| 10–15 | Press **Start game**. Students secretly read their role card and character card. Explain the map: network groups, close-knit vs loose-knit, link-persons (↔). |
+| 10–15 (cont.) | Model it once: chat with a student in character for 30 seconds using the variant, then swap chat codes. |
 | 15–60 | Play 3–5 rounds. The host page moves to the next phase automatically when the timer runs out. Use **+30 s** or the **Next ▸** button whenever you like. |
 | 60–85 | **Debrief** on the projector: the curve vs the S-curve, adoption by network and age group, who passed it to whom, and the six discussion questions. |
 | 85–90 | Exit ticket: "Explain one Chapter 9 concept using something that happened in the game." |
 
 **Tips**
+- Choose the variant in **Settings** ("Variant students speak"), or leave it on Random. th-fronting and "glim" are the easiest for students to hear.
+- Make space to walk around. After tapping 💬 Talk, students should physically go to the person they chat with. If your room is crowded, let them chat with neighbours only.
+- Movement needs a steady connection: positions update about 4 times a second. One 90-minute class uses roughly 0.3–0.5 GB of Firebase's free 10 GB per month, so even daily use stays free.
+- Test bots walk around the map too. They walk up to people (including you) and start chats, so you can try the whole flow alone.
 - Keep the host tab open for the whole game: it runs the game logic. If you refresh it by accident, choose **Resume game**.
 - Settings (in the lobby): the game uses about 1 Innovator per 6 players automatically (max = the Innovators setting). Lower the research target if your class answers slowly. Lengthen the meeting if discussion is good.
 - Students who are voted out can still answer fieldwork tasks, but they can't vote.
