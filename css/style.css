@@ -148,3 +148,10 @@ table.bd td, table.bd th { padding: 6px 8px; border-bottom: 1px solid var(--line
   body { background: #fff; color: #000; }
   .noprint { display: none !important; }
 }
+
+/* ---------- island movement ---------- */
+.joywrap { display: flex; align-items: center; gap: 16px; margin-top: 12px; }
+.joy { width: 128px; height: 128px; border-radius: 50%; background: radial-gradient(circle, #22405e 0%, #13263a 70%); border: 2px solid var(--line); position: relative; touch-action: none; flex: none; user-select: none; -webkit-user-select: none; }
+.joy .knob { position: absolute; left: 50%; top: 50%; width: 52px; height: 52px; margin: -26px 0 0 -26px; border-radius: 50%; background: var(--amber); box-shadow: 0 4px 12px rgba(0,0,0,.4); transition: transform .05s; pointer-events: none; }
+.toast { position: fixed; left: 50%; bottom: 20px; transform: translate(-50%, 140%); width: min(92vw, 480px); background: #3a2c0c; color: var(--ink); border: 2px solid var(--amber); border-radius: 14px; padding: 14px 16px; font-size: 1rem; z-index: 50; transition: transform .25s; box-shadow: 0 10px 30px rgba(0,0,0,.5); }
+.toast.show { transform: translate(-50%, 0); }
