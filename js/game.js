@@ -14,8 +14,10 @@ export const COLORS = ["#ef4444","#f97316","#f59e0b","#eab308","#84cc16","#22c55
 
 export const DEFAULT_SETTINGS = {
   innovators: 3,        // 2 for small classes (< 12)
-  fieldworkSec: 150,
-  meetingSec: 150,
+  fieldworkSec: 210,     // longer: students walk around and chat face to face
+  meetingSec: 210,       // town meeting in character + discussion
+  variant: "random",     // which speakable variant (see roleplay.js)
+  voice: true,           // voice notes on/off (record in character, +1 token per round, playback on projector)
   voteSec: 45,
   maxRounds: 5,
   tipping: 70,          // % of active speakers using the variant = change complete → Innovators win

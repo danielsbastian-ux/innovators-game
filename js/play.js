@@ -187,7 +187,8 @@ function latestClipRound(u) {
   const rs = Object.keys(D.vidx?.[u] || {}).map(Number).filter(n => !isNaN(n) && D.vidx[u][n]);
   return rs.length ? Math.max(...rs) : null;
 }
-const hasClip = u => latestClipRound(u) != null;
+const voiceOn = () => S().voice !== false;
+const hasClip = u => voiceOn() && latestClipRound(u) != null;
 const recordedThisRound = () => !!D.vidx?.[uid]?.[D.state?.round];
 
 async function toggleRecord() {
@@ -205,12 +206,12 @@ async function toggleRecord() {
     const blob = new Blob(rec.chunks, { type: rec.mr.mimeType || mime || "audio/webm" });
     const fr = new FileReader();
     fr.onload = async () => {
-      const r = D.state.round;
+      const r = D.state.round, first = !recordedThisRound();
       try {
         await db.set(`voice/${code}/${uid}/${r}`, { d: fr.result, at: db.now() });
         await db.set(`voiceIdx/${code}/${uid}/${r}`, db.now());
         clipCache[uid + ":" + r] = fr.result;
-        toast("🎙️ Voice note saved! Others nearby can now tap ▶ Listen to hear you.");
+        toast(`🎙️ Voice note saved!${first ? " +1 🪙" : ""} Others nearby can now tap ▶ Listen to hear you.`);
       } catch (e) { toast("Could not save the voice note: " + esc(e.message)); }
       updateActions();
     };
@@ -349,8 +350,8 @@ function renderGameScreen() {
         <div class="gs-actions">
           <button class="act" id="actTalk"></button>
           <button class="act" id="actTask"></button>
-          <button class="act" id="actRec"></button>
-          <button class="act" id="actPlay"></button>
+          ${voiceOn() ? `<button class="act" id="actRec"></button>
+          <button class="act" id="actPlay"></button>` : ""}
         </div>
       </div>
       ${ui.sheet ? `<div class="sheet"><div class="sheet-head"><b>${{ tasks: "📝 Fieldwork tasks", evidence: "🔍 Evidence", me: "🎭 Me & my character", terms: "📖 Key terms" }[ui.sheet]}</b><button class="btn ghost sm" data-close>✕ Map</button></div><div class="sheet-body" id="sheetBody"></div></div>` : ""}
@@ -389,8 +390,8 @@ function bindGame() {
     saveActions(); updateActions();
   };
   $("#actTask").onclick = e => { const q = e.currentTarget.dataset.u; if (!q) return; ui.sheet = "tasks"; ui.sheetTask = q; render(); };
-  $("#actRec").onclick = () => toggleRecord();
-  $("#actPlay").onclick = e => { const u = e.currentTarget.dataset.u; if (u) playClip(u); };
+  if ($("#actRec")) $("#actRec").onclick = () => toggleRecord();
+  if ($("#actPlay")) $("#actPlay").onclick = e => { const u = e.currentTarget.dataset.u; if (u) playClip(u); };
 }
 
 // ---------- sheets ----------
@@ -450,7 +451,7 @@ function renderMe() {
       <div>🕹️ Move with the joystick, or tap the map.</div>
       <div>📍 Walk to your numbered spots → <b>📝 Task</b> lights up.</div>
       <div>💬 Next to someone → <b>Talk</b> → find them in the room and chat in character (max 2).</div>
-      <div>🎙️ <b>Record</b> a short voice note in character (max ${VOICE_MAX} s). People near you can tap <b>▶ Listen</b> to hear it.</div></div>
+      ${voiceOn() ? `<div>🎙️ <b>Record</b> a short voice note in character (max ${VOICE_MAX} s, +1 🪙 once per round). People near you can tap <b>▶ Listen</b> to hear it, and your teacher may play it to the class.</div>` : ""}</div>
     ${innovatorGuide()}`;
 }
 
@@ -497,7 +498,7 @@ function renderJoin() {
 function howTo() {
   return `<details class="card" style="margin-top:12px"><summary><b>How to play</b></summary><div class="stack small" style="margin-top:10px">
     <p>🏝️ You live on a small island with four network groups. You get a <b>character</b>: play them whenever you speak. Secret <b>Innovators</b> are spreading a new way of speaking (the "variant") from person to person.</p>
-    <p>🗺️ In fieldwork, move your character with the joystick. Walk to your numbered 📍 spots to unlock tasks (each has a short field note to read first). Next to someone? Tap <b>💬 Talk</b>, then <b>find them in the real room and chat in character</b> (max 2 chats per round). You can also <b>🎙️ record</b> a short voice note that others can <b>▶ listen</b> to.</p>
+    <p>🗺️ In fieldwork, move your character with the joystick. Walk to your numbered 📍 spots to unlock tasks (each has a short field note to read first). Next to someone? Tap <b>💬 Talk</b>, then <b>find them in the real room and chat in character</b> (max 2 chats per round).${voiceOn() ? " You can also <b>🎙️ record</b> a short voice note in character (+1 🪙 per round) that others can <b>▶ listen</b> to." : ""}</p>
     <p>🔬 <b>Sociolinguists</b>: answer tasks to earn 🪙 tokens and fill the research bar. Spend tokens on evidence. Then vote out the Innovators in the meeting.</p>
     <p>🗣️ <b>Innovators</b>: always use the variant. The people you chat with may pick it up. Innovators win when the change reaches the tipping point.</p>
     <p>👂 If your phone says you've picked up the variant, <b>start using it</b>. Using it does not make someone an Innovator!</p></div></details>`;
@@ -584,7 +585,7 @@ function renderMeeting() {
       <p class="small">Say what <b>your character</b> thinks. ${role() === "innovator" ? "Use the variant! You may also share fake evidence to protect your team." : D.secret?.uses ? "Use the variant naturally." : "Then share your evidence."}</p></div>
     ${variantCard(true)}
     <div class="card stack"><h3>👂 Listening log</h3>
-      <p class="small muted">Listen to people as they speak in the meeting (or tap <b>▶</b> to play their voice note). If you hear the variant, tap <b>👂 Heard it</b>. This is your private fieldwork note.</p>
+      <p class="small muted">Listen to people as they speak in the meeting${voiceOn() ? " (or tap <b>▶</b> to play their voice note)" : ""}. If you hear the variant, tap <b>👂 Heard it</b>. This is your private fieldwork note.</p>
       <div class="plist">${rows}</div></div>
     ${characterCard(false)}${notebook()}`;
 }

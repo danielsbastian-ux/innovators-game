@@ -8,7 +8,8 @@ import { VARIANTS, VARIANT_KEYS, JOBS, ATTITUDES, GOALS, AGE_NOTES, PROMPTS, ISS
 const { esc, GROUPS, GROUP_KEYS, AGES } = G;
 const QMAP = Object.fromEntries(QUESTIONS.map(q => [q.id, q]));
 let db, code = null, game = null, busy = false, unsub = null, settingsOpen = false;
-let posData = {}, unsubPos = null, chatBusy = false;
+let posData = {}, unsubPos = null, chatBusy = false, vidx = {}, unsubVoice = null;
+const clipCache = {};
 const live = {};        // smoothed positions for drawing
 let trails = {};        // where each person walked this round (host memory)
 const lastChat = {};    // uid → time of their latest chat (for 💬 on the projector)
@@ -67,6 +68,8 @@ function attach(c) {
   unsub = db.on(`games/${c}`, v => { game = v; onGame(); });
   if (unsubPos) unsubPos();
   unsubPos = db.on(`pos/${c}`, v => { posData = v || {}; });
+  if (unsubVoice) unsubVoice();
+  unsubVoice = db.on(`voiceIdx/${c}`, v => { vidx = v || {}; if (game) onGame(); });
   requestAnimationFrame(drawLoop);
   setInterval(sampleTrails, 1000);
   setInterval(botMove, 400);
@@ -168,7 +171,9 @@ function scores() {
     for (const c of Object.values(game.secrets?.[u]?.clues || {})) if (c.ok) spent += CLUES[c.type]?.cost || 0;
     let convo = 0; // +1 per conversation partner, max 2 per round
     for (const round of Object.keys(qs)) if (arr(qs[round]).length) convo += Math.min(2, talked(u, round).length);
-    tokens[u] = correct + convo - spent;
+    let voice = 0; // +1 for one voice note per round (when voice notes are on)
+    if (S().voice) for (const round of Object.keys(qs)) if (arr(qs[round]).length && vidx?.[u]?.[round]) voice++;
+    tokens[u] = correct + convo + voice - spent;
     if (roleOf(u) === "sociolinguist") research += correct; // chats give tokens, not research
   }
   return { tokens, research };
@@ -545,6 +550,7 @@ function render() {
   const b = $("#next"); if (b) b.onclick = () => advance();
   const p = $("#plus"); if (p) p.onclick = () => db.update(`games/${code}/state`, { endsAt: (st().endsAt || db.now()) + 30000 });
   const e = $("#end"); if (e) e.onclick = () => { if (confirm("End the game now and show the debrief?")) endGame("none", "The teacher ended the game early."); };
+  document.querySelectorAll("[data-hplay]").forEach(b => b.onclick = () => hostPlay(b.dataset.hplay));
   const n = $("#newgame"); if (n) n.onclick = () => { localStorage.removeItem("innov-host-code"); location.reload(); };
 }
 
@@ -594,7 +600,8 @@ function phaseBox(ph, s, ej) {
     </div>
     <div class="card row spread"><span>🗣️ The variant is now used by <b style="color:#e879f9">${s.pct}%</b>${s.gain ? ` (+${s.gain}% this round)` : ""}</span>
       ${s.media ? `<span class="pill violet">📺 Media hype this round</span>` : ""}</div>
-    <div class="tip"><b>Chapter link:</b> ${esc(iss.concept)}</div>`;
+    <div class="tip"><b>Chapter link:</b> ${esc(iss.concept)}</div>
+    ${clipList(false)}`;
   }
   if (ph === "vote") {
     const r = s.round, alive = activeUids();
@@ -641,6 +648,36 @@ function winnerBox() {
   return `<div class="winner ${cls}"><div class="big-msg">${title}</div><p>${esc(s.reason || "")}</p></div>`;
 }
 
+// ---------- voice notes on the projector ----------
+function clipList(withRoles) {
+  if (!S().voice) return "";
+  const d = game.debrief || {};
+  const rows = [];
+  for (const u of allUids()) {
+    const rs = Object.keys(vidx?.[u] || {}).filter(r => vidx[u][r]).map(Number).filter(n => !isNaN(n)).sort((a, b) => a - b);
+    if (!rs.length) continue;
+    let tag = "";
+    if (withRoles) {
+      const inn = d.roles?.[u] === "innovator", ad = d.adopted?.[u];
+      tag = inn ? '<span class="pill violet" style="padding:1px 8px">Innovator</span>' : ad ? `<span class="pill amber" style="padding:1px 8px">picked it up in R${ad.round}</span>` : '<span class="pill" style="padding:1px 8px">never adopted</span>';
+    }
+    rows.push(`<div class="row" style="gap:8px;padding:4px 0">${avatar(P(u))}<b style="min-width:90px">${esc(nameOf(u))}</b>${tag}
+      <span class="row" style="gap:6px;margin-left:auto">${rs.map(r => `<button class="btn sm teal" data-hplay="${u}:${r}">▶ R${r}</button>`).join("")}</span></div>`);
+  }
+  if (!rows.length) return withRoles ? `<div class="card small muted">🎧 No voice notes were recorded in this game.</div>` : "";
+  return withRoles
+    ? `<div class="card stack"><h3>🎧 Voice notes: listen again</h3><p class="small muted">Play the recordings round by round. When did each person start using the variant? Did the people who picked it up notice (change from below)?</p>${rows.join("")}</div>`
+    : `<div class="card stack"><b>🎧 Play voice notes to the class</b><p class="small muted" style="margin:0">Tap ▶ and ask: did you hear the variant?</p>${rows.join("")}</div>`;
+}
+async function hostPlay(key) {
+  const [u, r] = key.split(":");
+  try {
+    if (!clipCache[key]) clipCache[key] = (await db.get(`voice/${code}/${u}/${r}`))?.d;
+    if (!clipCache[key]) throw new Error("not found");
+    await new Audio(clipCache[key]).play();
+  } catch (e) { window.showGameError?.("Could not play this voice note: " + (e.message || e)); }
+}
+
 function debriefExtra() {
   const d = game.debrief || {};
   const pr = normProfiles();
@@ -662,6 +699,7 @@ function debriefExtra() {
     <div class="card" style="flex:1;min-width:240px">${t(byAge, "Age group")}</div>
   </div>
   <div class="card stack"><h3>Who passed it to whom</h3><div class="flow">${flow}</div></div>
+  ${clipList(true)}
   <div class="card stack"><h3>Debrief questions (Chapter 9)</h3><ol>
     <li>Look at the curve. Was the change slow, fast, then slow again? Where was it steepest, and why?</li>
     <li>Which network group did the change start in? Which group resisted longest? How do close-knit vs loose-knit networks explain this?</li>
@@ -708,6 +746,7 @@ function renderLobby() {
         ${field("maxRounds", "Max rounds", 2, 10)}
         ${field("tipping", "Change complete at (%)", 40, 95, 5)}
         ${field("researchPerPlayer", "Research target per player", 2, 20)}
+        <div><label>Voice notes (record & listen)</label><select data-set="voice"><option value="true" ${s.voice ? "selected" : ""}>On</option><option value="false" ${!s.voice ? "selected" : ""}>Off</option></select></div>
         <div><label>Variant students speak</label><select data-set="variant"><option value="random" ${!VARIANTS[s.variant] ? "selected" : ""}>Random</option>${VARIANT_KEYS.map(k => `<option value="${k}" ${s.variant === k ? "selected" : ""}>${esc(VARIANTS[k].name)}</option>`).join("")}</select></div>
         <div><label>Reveal role when voted out</label><select data-set="revealOnEject"><option value="true" ${s.revealOnEject ? "selected" : ""}>Yes</option><option value="false" ${!s.revealOnEject ? "selected" : ""}>No</option></select></div>
       </div>
@@ -717,11 +756,15 @@ function renderLobby() {
   try { if (window.QRCode) new QRCode($("#qr"), { text: url, width: 180, height: 180 }); else $("#qr").style.display = "none"; } catch { $("#qr").style.display = "none"; }
   $("#bots").onclick = () => addBots(5);
   const nb = $("#nobots"); if (nb) nb.onclick = removeBots;
-  $("#setbox").ontoggle = () => { settingsOpen = $("#setbox").open; };
+  $("#setbox").ontoggle = e => {
+    // the lobby may have been redrawn (e.g. a student joined) between the click and this event
+    settingsOpen = e.target.open;
+    const cur = $("#setbox"); if (cur && cur !== e.target && cur.open !== settingsOpen) cur.open = settingsOpen;
+  };
   $("#start").onclick = () => { if (!busy) { busy = true; startGame().catch(e => window.showGameError?.(e.message || String(e))).finally(() => busy = false); } };
   document.querySelectorAll("[data-kick]").forEach(b => b.onclick = () => db.remove(`games/${code}/players/${b.dataset.kick}`));
   document.querySelectorAll("[data-set]").forEach(i => i.onchange = () => {
-    const k = i.dataset.set; const v = k === "revealOnEject" ? i.value === "true" : k === "variant" ? i.value : Number(i.value);
+    const k = i.dataset.set; const v = (k === "revealOnEject" || k === "voice") ? i.value === "true" : k === "variant" ? i.value : Number(i.value);
     db.update(`games/${code}/settings`, { [k]: v });
   });
 }
